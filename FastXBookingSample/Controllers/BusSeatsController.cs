@@ -36,11 +36,11 @@ namespace FastXBookingSample.Controllers
         [Authorize(Roles = "Bus Operator,Admin,User")]
         [ProducesResponseType(200, Type = typeof(List<BusSeatDto>))]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<List<BusSeatDto>>> GetBusSeat(int busid)
+        public async Task<ActionResult<List<BusSeatDto>>> GetBusSeat(int busid,DateTime deptId)
         {
             try
             {
-                return Ok(_mapper.Map<List<BusSeatDto>>(_busSeatRepository.GetSeatsByBusId(busid)));
+                return Ok(_mapper.Map<List<BusSeatDto>>(_busSeatRepository.GetSeatsByBusId(busid,deptId)));
             }
             catch(BusNotFoundException ex)
             {

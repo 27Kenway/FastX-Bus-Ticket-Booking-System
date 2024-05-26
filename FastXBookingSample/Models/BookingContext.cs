@@ -22,6 +22,7 @@ namespace FastXBookingSample.Models
         public virtual DbSet<BookingHistory> BookingHistories { get; set; } = null!;
         public virtual DbSet<Bus> Buses { get; set; } = null!;
         public virtual DbSet<BusAmenity> BusAmenities { get; set; } = null!;
+        public virtual DbSet<BusDeparture> BusDepartures { get; set; } = null!;
         public virtual DbSet<BusSeat> BusSeats { get; set; } = null!;
         public virtual DbSet<DroppingPoint> DroppingPoints { get; set; } = null!;
         public virtual DbSet<Route> Routes { get; set; } = null!;
@@ -60,7 +61,8 @@ namespace FastXBookingSample.Models
                 entity.HasOne(d => d.Bus)
                     .WithMany(p => p.BoardingPoints)
                     .HasForeignKey(d => d.BusId)
-                    .HasConstraintName("FK__BoardingP__BusId__534D60F1");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_BoardingPoints_Bus");
             });
 
             modelBuilder.Entity<Booking>(entity =>
@@ -70,7 +72,13 @@ namespace FastXBookingSample.Models
                 entity.HasOne(d => d.Bus)
                     .WithMany(p => p.Bookings)
                     .HasForeignKey(d => d.BusId)
-                    .HasConstraintName("FK__Booking__BusId__619B8048");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Booking_BusId");
+
+                entity.HasOne(d => d.Dept)
+                    .WithMany(p => p.Bookings)
+                    .HasForeignKey(d => d.DeptId)
+                    .HasConstraintName("FK__Booking__DeptId__1209AD79");
 
                 entity.HasOne(d => d.Dropping)
                     .WithMany(p => p.Bookings)
@@ -119,7 +127,7 @@ namespace FastXBookingSample.Models
                 entity.HasOne(d => d.Booking)
                     .WithMany(p => p.BookingHistories)
                     .HasForeignKey(d => d.BookingId)
-                    .OnDelete(DeleteBehavior.SetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__BookingHi__Booki__6FE99F9F");
             });
 
@@ -138,8 +146,6 @@ namespace FastXBookingSample.Models
                 entity.Property(e => e.BusType)
                     .HasMaxLength(20)
                     .IsUnicode(false);
-
-                entity.Property(e => e.DepartureDate).HasColumnType("date");
 
                 entity.Property(e => e.Destination)
                     .HasMaxLength(20)
@@ -162,7 +168,23 @@ namespace FastXBookingSample.Models
                 entity.HasOne(d => d.Bus)
                     .WithMany(p => p.BusAmenities)
                     .HasForeignKey(d => d.BusId)
-                    .HasConstraintName("FK__Bus_Ameni__BusId__72C60C4A");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Bus_Amenities_BusId");
+            });
+
+            modelBuilder.Entity<BusDeparture>(entity =>
+            {
+                entity.ToTable("BusDeparture");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.DepartureDate).HasColumnType("date");
+
+                entity.HasOne(d => d.Bus)
+                    .WithMany(p => p.BusDepartures)
+                    .HasForeignKey(d => d.BusId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__BusDepart__BusId__09746778");
             });
 
             modelBuilder.Entity<BusSeat>(entity =>
@@ -175,6 +197,11 @@ namespace FastXBookingSample.Models
                     .HasForeignKey(d => d.BusId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_BusSeats_BusId");
+
+                entity.HasOne(d => d.Departure)
+                    .WithMany(p => p.BusSeats)
+                    .HasForeignKey(d => d.DepartureId)
+                    .HasConstraintName("FK_BusSeats_BusDepartures");
             });
 
             modelBuilder.Entity<DroppingPoint>(entity =>
@@ -189,7 +216,8 @@ namespace FastXBookingSample.Models
                 entity.HasOne(d => d.Bus)
                     .WithMany(p => p.DroppingPoints)
                     .HasForeignKey(d => d.BusId)
-                    .HasConstraintName("FK__DroppingP__BusId__5629CD9C");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_DroppingPoints_Bus");
             });
 
             modelBuilder.Entity<Route>(entity =>
@@ -203,7 +231,8 @@ namespace FastXBookingSample.Models
                 entity.HasOne(d => d.Bus)
                     .WithMany(p => p.Routes)
                     .HasForeignKey(d => d.BusId)
-                    .HasConstraintName("FK__Route__BusId__59063A47");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Route_Bus");
             });
 
             modelBuilder.Entity<Seat>(entity =>

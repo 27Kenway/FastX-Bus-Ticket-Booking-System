@@ -52,15 +52,34 @@ namespace FastXBookingSample.Repository
         {
             DateTime startDate = date.ToDateTime(TimeOnly.Parse("12:00 PM"));
             DateTime endDate = startDate.AddDays(1);
-            List<Bus> buses = _context.Buses
-                     .Where(x => x.Origin == origin &&
-                x.Destination == destination &&
-                x.DepartureDate >= startDate &&
-                x.DepartureDate < endDate)
-                .Include(b => b.BusAmenities)
-                       .ThenInclude(ba => ba.Amenity)
-                    .Include(b => b.BusSeats) 
-                    .ToList();
+            List<int> busIds = _context.BusDepartures
+                           .Where(x => x.DepartureDate >= startDate && x.DepartureDate < endDate)
+                           .Select(x => x.BusId.Value)
+                           .ToList();
+            var buses = _context.Buses
+                       .Where(x => busIds.Contains(x.BusId) &&
+                                   x.Origin == origin &&
+                                   x.Destination == destination)
+                       .Select(b => new Bus
+                       {
+                           BusId = b.BusId,
+                           BusName = b.BusName,
+                           BusType = b.BusType,
+                           Origin = b.Origin,
+                           Destination = b.Destination,
+                           NoOfSeats = b.NoOfSeats,
+                           StartTime = b.StartTime,
+                           EndTime = b.EndTime,
+                           Fare = b.Fare,
+                           BusOperator = b.BusOperator,
+                           BusAmenities = b.BusAmenities.Select(ba => new BusAmenity
+                           {
+                               AmenityId = ba.AmenityId,
+                               Amenity = ba.Amenity
+                           }).ToList(),
+                           BusSeats = b.BusSeats.Where(bs => bs.BusId == b.BusId && bs.DepartureId==(_context.BusDepartures.FirstOrDefault(x=>x.BusId==b.BusId && x.DepartureDate >= startDate && x.DepartureDate < endDate)).Id).ToList() // Filter seats by BusId
+                       })
+                       .ToList();
             return buses;
         }
 
@@ -131,7 +150,8 @@ namespace FastXBookingSample.Repository
         {
             return _context.Buses
                        .Include(b => b.BusAmenities)
-                           .ThenInclude(ba => ba.Amenity)
+                           //.ThenInclude(ba => ba.Amenity)
+                           .Include(b=> b.BusDepartures)
                        .Where(b => b.BusOperator == busOperatorId)
                        .ToList();
         }

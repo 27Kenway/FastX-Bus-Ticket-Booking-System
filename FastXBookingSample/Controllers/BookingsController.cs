@@ -75,9 +75,9 @@ namespace FastXBookingSample.Controllers
         [Authorize(Roles = "User")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<BookingDto>> PostBooking(BookingDto bookingdto)
+        public async Task<ActionResult<BookingDto>> PostBooking(BookingDto bookingdto,DateTime deptDate)
         {
-            return Ok(_bookingRepository.PostBooking(_mapper.Map<Booking>(bookingdto)));
+            return Ok(_bookingRepository.PostBooking(_mapper.Map<Booking>(bookingdto),deptDate));
         }
 
         // DELETE: api/Bookings/5

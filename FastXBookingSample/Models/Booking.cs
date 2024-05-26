@@ -16,8 +16,10 @@ namespace FastXBookingSample.Models
         public int? BusId { get; set; }
         public int? BoardingId { get; set; }
         public int? DroppingId { get; set; }
+        public int? DeptId { get; set; }
 
         public virtual Bus? Bus { get; set; }
+        public virtual BusDeparture? Dept { get; set; }
         public virtual DroppingPoint? Dropping { get; set; }
         public virtual BoardingPoint? Boarding { get; set; }
         public virtual User? User { get; set; }

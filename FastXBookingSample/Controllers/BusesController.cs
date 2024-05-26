@@ -24,14 +24,15 @@ namespace FastXBookingSample.Controllers
         private readonly IBusSeatRepository _busSeatRepository;
         private readonly BookingContext _context;
         private readonly ILogger<BusesController> _logger;
-
-        public BusesController(IBusRepository busrepository,IMapper mapper, IBusSeatRepository busSeatRepository,BookingContext context,ILogger<BusesController> logger)
+        private readonly IBusDepartureRepository _busDepartureRepository;
+        public BusesController(IBusRepository busrepository,IMapper mapper, IBusSeatRepository busSeatRepository,BookingContext context,ILogger<BusesController> logger,IBusDepartureRepository busDepartureRepository)
         {
             _busrepository = busrepository;
             _mapper = mapper;
             _busSeatRepository = busSeatRepository;
             _context = context;
             _logger = logger;
+            _busDepartureRepository = busDepartureRepository;
         }
 
         // GET: api/Buses
@@ -105,7 +106,7 @@ namespace FastXBookingSample.Controllers
                 if (existingBus.NoOfSeats != busdto.NoOfSeats)
                 {
                     _busSeatRepository.DeleteSeatsByBusId(busdto.BusId);
-                    _busSeatRepository.AddSeatByBusId(busdto.BusId, busdto.NoOfSeats);
+                    //_busSeatRepository.AddSeatByBusId(busdto.BusId, busdto.NoOfSeats);
                 }
                 _context.Entry(existingBus).State = EntityState.Detached;
 
@@ -133,7 +134,7 @@ namespace FastXBookingSample.Controllers
         [Authorize(Roles = "Bus Operator")]
         [ProducesResponseType(200 ,Type=typeof(string))]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Bus>> PostBus(BusDto busdto)
+        public async Task<ActionResult<Bus>> PostBus(BusDto busdto,DateTime departureDate)
         {
             try
             {
@@ -143,8 +144,7 @@ namespace FastXBookingSample.Controllers
                     return BadRequest(ModelState);
                 var bus = _mapper.Map<Bus>(busdto);
                 Bus message = _busrepository.CreateBus(bus);
-                _busSeatRepository.AddSeatByBusId(bus.BusId, bus.NoOfSeats);
-
+                
                 return Ok(message);
             }
             catch (NoBusAvailableException ex)

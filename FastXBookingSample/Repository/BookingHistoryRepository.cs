@@ -27,6 +27,8 @@ namespace FastXBookingSample.Repository
                        .ThenInclude(b => b.Boarding)  // Then include the Boarding related to each Booking
                 .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
                        .ThenInclude(b => b.Dropping)
+                          .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
+                       .ThenInclude(b => b.Dept)
                  .Where(x=>x.BusNumber==bus.BusNumber && x.BusName==bus.BusName).ToList();
             return bookingHistories;
         }
@@ -40,7 +42,9 @@ namespace FastXBookingSample.Repository
     .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
         .ThenInclude(b => b.Boarding)  // Then include the Boarding related to each Booking
     .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
-        .ThenInclude(b => b.Dropping)  // Then include the Dropping related to each Booking
+        .ThenInclude(b => b.Dropping)
+        .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
+        .ThenInclude(b => b.Dept)// Then include the Dropping related to each Booking
     .Where(x => x.UserName == user.Email)  // Filter by UserName
     .ToList();
 
@@ -57,6 +61,8 @@ namespace FastXBookingSample.Repository
         .ThenInclude(b => b.Boarding)  // Then include the Boarding related to each Booking
     .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
         .ThenInclude(b => b.Dropping)
+        .Include(x => x.Booking)  // Include the Booking related to each BookingHistory again
+        .ThenInclude(b => b.Dept)
                 .Where(x => x.UserName == user.Email&& x.IsCancelled==true).ToList();
             return bookingHistories;
         }
