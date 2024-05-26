@@ -28,20 +28,22 @@ namespace FastXBookingTest
         [Test]
         public async Task TestForGetAllBoardingbyBusId()
         {
-            _busSeat.Setup(x => x.GetSeatsByBusId(It.IsAny<int>())).Returns(new List<BusSeat>()
+            _busSeat.Setup(x => x.GetSeatsByBusId(It.IsAny<int>(), It.IsAny<DateTime>())).Returns(new List<BusSeat>()
             {
                 new BusSeat()
                 {
                    IsBooked = true,
+                   DepartureId=2,
                    SeatNo = 1,
                 },
                  new BusSeat()
                 {
                    IsBooked = false,
                    SeatNo = 2,
+                   DepartureId=3,
                 },
             });
-            List<BusSeat> output = await Task.Run(() => _busSeat.Object.GetSeatsByBusId(2));
+            List<BusSeat> output = await Task.Run(() => _busSeat.Object.GetSeatsByBusId(2,new DateTime()));
             Assert.AreEqual(output[0].IsBooked, true);
             Assert.AreEqual(output[0].SeatNo, 1);
             Assert.AreEqual(output[1].IsBooked, false);

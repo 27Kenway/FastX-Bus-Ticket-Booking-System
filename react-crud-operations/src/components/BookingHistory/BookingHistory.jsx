@@ -36,7 +36,7 @@ function BookingHistory() {
             seatId: seat.seatId,
             busNumber: booking.bus.busNumber,
             bookingTime: seat.bookingDateTime,
-            departureDate: new Date(booking.bus.departureDate),
+            departureDate: new Date(booking.dept.departureDate),
             boarding: booking.boarding ? booking.boarding.placeName : 'Not specified',
             dropping: booking.dropping ? booking.dropping.placeName : 'Not specified',
             boardingTime: booking.boarding ? booking.boarding.timings : 'Not specified',
@@ -49,6 +49,7 @@ function BookingHistory() {
         );
 
         transformedBookingInfo.sort((a, b) => a.departureDate - b.departureDate);
+        console.log(transformedBookingInfo)
         setBookingInfo(transformedBookingInfo);
 
         const cancelledResponse = await axios.get(`https://localhost:7114/api/BookingHistories/getCancelledBookingsByUserId/${userId}`, {
@@ -66,7 +67,7 @@ function BookingHistory() {
             boardingTime: booking.booking.boarding.timings,
             dropping: booking.booking.dropping.placeName,
             droppingTime: booking.booking.dropping.timings,
-            departureDate: new Date(booking.booking.bus.departureDate),
+            departureDate: new Date(booking.booking.dept.departureDate),
             origin: booking.booking.bus ? booking.booking.bus.origin : 'Not specified',
             destination:  booking.booking.bus ? booking.booking.bus.destination : 'Not specified',
             seatNo: booking.seats,
@@ -94,7 +95,7 @@ function BookingHistory() {
             boardingTime: booking.booking.boarding.timings,
             dropping: booking.booking.dropping.placeName,
             droppingTime: booking.booking.dropping.timings,
-            departureDate: new Date(booking.booking.bus.departureDate),
+            departureDate: new Date(booking.booking.dept.departureDate),
             origin: booking.booking.bus ? booking.booking.bus.origin : 'Not specified',
             destination:  booking.booking.bus ? booking.booking.bus.destination : 'Not specified',
             seatNo: booking.seats,

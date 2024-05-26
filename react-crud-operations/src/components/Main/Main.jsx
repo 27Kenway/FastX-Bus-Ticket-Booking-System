@@ -29,21 +29,6 @@ function Main(){
             </div>
         </div>
 
-        {/* <div className="about-section">
-            <div className="about-content">
-                <h2>About FastX Bus Services</h2>
-                <p>
-                    Welcome to FastX Bus Services! We strive to provide a seamless and enjoyable bus booking experience. 
-                    Explore our wide range of destinations and book your bus tickets with ease. Bus operators can also 
-                    register with us to showcase their services to a broader audience. Join us on the journey of hassle-free
-                    and comfortable bus travel.
-                </p>
-            </div>
-        </div>
-
-        <div className="scroll-text">
-            <p>Scroll down to learn more about our services and offerings.</p>
-            </div> */}
 </div>
     )
 }

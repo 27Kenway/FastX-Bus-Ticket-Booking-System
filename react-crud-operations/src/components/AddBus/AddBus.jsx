@@ -28,14 +28,26 @@ function AddBus() {
     const [dropTimingss,setDropTimingss]=useState([])
     const [busRoutes,setBusRoutes]=useState([])
     const [busId,setBusId]=useState(null)
+    const [weekBusId,setweekBusId]=useState(null)
     const navigate=useNavigate()
+    const [isWeekly, setIsWeekly] = useState(false);
+const [isCustom, setIsCustom] = useState(false);
+const [customDates, setCustomDates] = useState([]);
 
     const [amenities, setAmenities] = useState([]);
     const [selectedAmenities, setSelectedAmenities] = useState([]);
     const token=sessionStorage.getItem('authToken');
     const role=sessionStorage.getItem('role')
 
+    const handleAddDate = () => {
+        setCustomDates([...customDates, ""]);
+    };
 
+    const handleRemoveDate = (index) => {
+        const newDates = [...customDates];
+        newDates.splice(index, 1);
+        setCustomDates(newDates);
+    };
     useEffect(() => {
         console.log(role)
         if(!(token && role=='Bus Operator')){
@@ -58,10 +70,18 @@ function AddBus() {
     
         getAmenities();
     }, [busId]);
-    
+    const [minDate, setMinDate] = useState('');
+    useEffect(() => {
+        const token = sessionStorage.getItem('authToken');
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 1);
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        setMinDate(formattedToday);
+    }, []);
 
     const nextStep = async () => {
-        if (!busName || !busNumber || !busType || !noOfSeats || !origin || !destination || !startTime || !endTime || !fare || !departureDate || !boardingPoints || !boardTimings || !droppingPoints || !dropTimings || !busRoute) {
+        if (!busName || !busNumber || !busType || !noOfSeats || !origin || !destination || !startTime || !endTime || !fare || !boardingPoints || !boardTimings || !droppingPoints || !dropTimings || !busRoute) {
             window.alert("Please fill in all fields.");
             return;
         }
@@ -100,6 +120,7 @@ function AddBus() {
 
 
     try {
+        
         const response = await axios.post(`https://localhost:7114/api/Buses`, {
             busName: busName,
             busType: busType,
@@ -111,15 +132,17 @@ function AddBus() {
             endTime:endTime,
             fare:fare,
             busOperator:sessionStorage.getItem('userId'),
-            departureDate:departureDate
         }, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
-
+        
+        
         console.log("Response "+response.data.busId);
-        setBusId(response.data.busId);
+        await setBusId(response.data.busId);
+
+       
     }catch(error){
             console.error(error)
         }
@@ -139,7 +162,60 @@ function AddBus() {
     };
 
     const addBus = async () => {
-    
+        
+        if (isCustom && busId) {
+            
+            for (const date of customDates) {
+                const res = await axios.post(`https://localhost:7114/api/BusDeparture`, {
+                    busId: busId,
+                    departureDate: date
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                
+            }
+    }
+    // if (isWeekly) {
+    //     const today = new Date();
+    //     for (let i = 0; i < 7; i++) {
+    //         let date = new Date(today);
+    //         date.setDate(today.getDate() + i);
+    //         const res = await axios.post(
+    //             `https://localhost:7114/api/BusDeparture`,
+    //             {
+    //                 busId: i % 2 === 0 ? busId : weekBusId,
+    //                 departureDate: date.toISOString(), 
+    //             },
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
+    //     }
+    // }
+
+    if (isWeekly) {
+        const today = new Date();
+        for (let i = 0; i < 7; i=i+2) {
+            let date = new Date(today);
+            date.setDate(today.getDate() + i);
+            const res = await axios.post(
+                `https://localhost:7114/api/BusDeparture`,
+                {
+                    busId: i % 2 === 0 ? busId : weekBusId,
+                    departureDate: date.toISOString(), 
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+        }
+    }
         console.log(boardingPointss)
         console.log(droppingPointss)
         console.log("BusId"+busId)
@@ -264,162 +340,211 @@ function AddBus() {
             case 1:
                 return (
                     <>
-                        <div className="mb-3">
-                            <label htmlFor="busName" className="form-label">Bus Name:</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="busName"
-                                value={busName}
-                                onChange={(e) => setBusName(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="busnumber" className="form-label">Bus Number:</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="busnumber"
-                                value={busNumber}
-                                onChange={(e) => setBusNumber(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="bustype" className="form-label">Bus Type:</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="bustype"
-                                value={busType}
-                                onChange={(e) => setBusType(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-    <label htmlFor="noofseats" className="form-label">Total Number of Seats:</label>
-    <input
-        type="number"
-        className="form-control"
-        id="noofseats"
-        value={noOfSeats}
-        min={16}
-        max={24}
-        step={4}
-        onChange={(e) => setNoOfSeats(e.target.value)}
-    />
-</div>
+            <div className="mb-3">
+                <label htmlFor="busName" className="form-label">Bus Name:</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="busName"
+                    value={busName}
+                    onChange={(e) => setBusName(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="busnumber" className="form-label">Bus Number:</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="busnumber"
+                    value={busNumber}
+                    onChange={(e) => setBusNumber(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="bustype" className="form-label">Bus Type:</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="bustype"
+                    value={busType}
+                    onChange={(e) => setBusType(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="noofseats" className="form-label">Total Number of Seats:</label>
+                <input
+                    type="number"
+                    className="form-control"
+                    id="noofseats"
+                    value={noOfSeats}
+                    min={16}
+                    max={24}
+                    step={4}
+                    onChange={(e) => setNoOfSeats(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="origin" className="form-label">Origin</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="origin"
+                    value={origin}
+                    onChange={(e) => setOrigin(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="destination" className="form-label">Destination</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="destination"
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="starttime" className="form-label">Start Time</label>
+                <input
+                    type="time"
+                    className="form-control"
+                    id="starttime"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="endtime" className="form-label">End Time</label>
+                <input
+                    type="time"
+                    className="form-control"
+                    id="endtime"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="fare" className="form-label">Fare</label>
+                <input
+                    type="number"
+                    className="form-control"
+                    id="fare"
+                    value={fare}
+                    onChange={(e) => setFare(e.target.value)}
+                />
+            </div>
 
-                        <div className="mb-3">
-                            <label htmlFor="origin" className="form-label">Origin</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="origin"
-                                value={origin}
-                                onChange={(e) => setOrigin(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="destination" className="form-label">Destination</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="destination"
-                                value={destination}
-                                onChange={(e) => setDestination(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="starttime" className="form-label">Start Time</label>
-                            <input
-                                type="time"
-                                className="form-control"
-                                id="starttime"
-                                value={startTime}
-                                onChange={(e) => setStartTime(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="endtime" className="form-label">End Time</label>
-                            <input
-                                type="time"
-                                className="form-control"
-                                id="endtime"
-                                value={endTime}
-                                onChange={(e) => setEndTime(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="fare" className="form-label">Fare</label>
-                            <input
-                                type="number"
-                                className="form-control"
-                                id="fare"
-                                value={fare}
-                                onChange={(e) => setFare(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="daparturedate" className="form-label">Departure Date</label>
-                            <input
-                                type="date"
-                                className="form-control"
-                                id="daparturedate"
-                                value={departureDate}
-                                onChange={(e) => setDepartureDate(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="boardingpoints" className="form-label">Boarding Points</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="boardingpoints"
-                                value={boardingPoints}
-                                onChange={(e) => setBoardingPoints(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="boardingtimings" className="form-label">Boarding Timings</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="boardingtimings"
-                                value={boardTimings}
-                                onChange={(e) => setBoardTimings(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="droppingpoints" className="form-label">Dropping Points</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="droppingpoints"
-                                value={droppingPoints}
-                                onChange={(e) => setDroppingPoints(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="droppingtimings" className="form-label">Dropping Timings</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="boardingtimings"
-                                value={dropTimings}
-                                onChange={(e) => setDropTimings(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="busroute" className="form-label">Bus Route</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="busroute"
-                                value={busRoute}
-                                onChange={(e) => setBusRoute(e.target.value)}
-                            />
-                        </div>
-                        <button onClick={nextStep} className="btn btn-primary">Next</button>
+            <div className="mb-3">
+                <label className="form-label">Departure Date</label>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="weekly"
+                        checked={isWeekly}
+                        onChange={() => { setIsWeekly(!isWeekly); setIsCustom(false); }}
+                    />
+                    <label htmlFor="weekly" className="form-check-label">Weekly</label>
+                </div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="custom"
+                        checked={isCustom}
+                        onChange={() => { setIsCustom(!isCustom); setIsWeekly(false); }}
+                    />
+                    <label htmlFor="custom" className="form-check-label">Custom</label>
+                </div>
+
+                {isCustom && (
+                    <>
+                        {customDates.map((date, index) => (
+                            <div key={index} className="input-group mb-3">
+                                <input
+                                    type="date"
+                                    min={minDate}
+                                    className="form-control"
+                                    value={date}
+                                    onChange={(e) => {
+                                        const newDates = [...customDates];
+                                        newDates[index] = e.target.value;
+                                        setCustomDates(newDates);
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={() => handleRemoveDate(index)}
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            className="btn btn-secondary mt-2"
+                            onClick={handleAddDate}
+                        >
+                            Add Date
+                        </button>
                     </>
+                )}
+            </div>
+
+            <div className="mb-3">
+                <label htmlFor="boardingpoints" className="form-label">Boarding Points</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="boardingpoints"
+                    value={boardingPoints}
+                    onChange={(e) => setBoardingPoints(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="boardingtimings" className="form-label">Boarding Timings</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="boardingtimings"
+                    value={boardTimings}
+                    onChange={(e) => setBoardTimings(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="droppingpoints" className="form-label">Dropping Points</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="droppingpoints"
+                    value={droppingPoints}
+                    onChange={(e) => setDroppingPoints(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="droppingtimings" className="form-label">Dropping Timings</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="droppingtimings"
+                    value={dropTimings}
+                    onChange={(e) => setDropTimings(e.target.value)}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="busroute" className="form-label">Bus Route</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="busroute"
+                    value={busRoute}
+                    onChange={(e) => setBusRoute(e.target.value)}
+                />
+            </div>
+            <button onClick={nextStep} className="btn btn-primary">Next</button>
+        </>
+
                 );
             case 2:
                 return (
