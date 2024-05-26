@@ -50,11 +50,14 @@ public class SeatCleanupService : BackgroundService
         try
         {
             DateTime today = DateTime.UtcNow.Date;
-
+            List<int> busIds = context.BusDepartures
+                            .Where(x => x.DepartureDate < today && x.BusId != null)
+                            .Select(x => x.BusId.Value)
+                            .ToList();
             List<int> bookingIdsToRemove = context.Bookings
                 .Where(booking =>
                     context.Buses
-                        .Any(bus => bus.BusId == booking.BusId && bus.DepartureDate < today)
+                        .Any(bus => busIds.Contains(bus.BusId))
                 )
                 .Select(booking => booking.BookingId)
                 .ToList();
@@ -64,7 +67,7 @@ public class SeatCleanupService : BackgroundService
                 .ToList();
 
             foreach (Seat seat in seatsToRemove)
-            {
+            {   
                 context.Seats.Remove(seat);
                 BusSeat busseat = context.BusSeats.FirstOrDefault(x => x.SeatNo == seat.SeatNumber && x.BusId == (context.Bookings.FirstOrDefault(x => x.BookingId == seat.BookingId).BusId));
                 busseat.IsBooked = false;

@@ -9,7 +9,9 @@ namespace FastXBookingSample.Models
         public int? BusId { get; set; }
         public int? SeatNo { get; set; }
         public bool? IsBooked { get; set; }
+        public int? DepartureId { get; set; }
 
         public virtual Bus? Bus { get; set; }
+        public virtual BusDeparture? Departure { get; set; }
     }
 }

@@ -57,6 +57,7 @@ namespace FastXBookingSample
             builder.Services.AddTransient<IRouteRepository,RouteRepository>();
             builder.Services.AddTransient<IUserRepository,UserRepository>();
             builder.Services.AddTransient<IBusSeatRepository,BusSeatRepository>();
+            builder.Services.AddTransient<IBusDepartureRepository,BusDepartureRepository>();
             builder.Services.AddTransient<IBookingRepository,BookingRepository>();
             builder.Services.AddTransient<ISeatRepository,SeatRepository>();
             builder.Services.AddTransient<IBusOperatorRepository,BusOperatorRepository>();

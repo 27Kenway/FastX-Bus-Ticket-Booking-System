@@ -43,6 +43,7 @@ namespace FastXBookingSample.Repository
         .Include(b => b.Bus)
         .Include(b => b.Boarding)
         .Include(b => b.Dropping)
+        .Include(b => b.Dept)
         .Where(b => b.UserId == userId)
         .ToList();
 
@@ -53,13 +54,14 @@ namespace FastXBookingSample.Repository
             return _context.Bookings.Any(x=>x.BookingId == id);
         }
 
-        public Booking PostBooking(Booking booking)
+        public Booking PostBooking(Booking booking,DateTime deptDate)
         {
             if (!IsUser(Convert.ToInt32(booking.UserId)))
                 throw new UserNotFoundException();
             Booking book = _context.Bookings.FirstOrDefault(x=>x.UserId == booking.UserId &&x.BusId == booking.BusId && x.BoardingId==booking.BoardingId && x.DroppingId==booking.DroppingId);
             if(book != null)
                return book;
+            booking.DeptId = (_context.BusDepartures.FirstOrDefault(x => x.BusId == booking.BusId && x.DepartureDate == deptDate)).Id;
             _context.Bookings.Add(booking);
             _context.SaveChanges();
             return booking;

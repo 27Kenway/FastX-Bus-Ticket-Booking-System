@@ -10,6 +10,7 @@ namespace FastXBookingSample.Models
             BoardingPoints = new HashSet<BoardingPoint>();
             Bookings = new HashSet<Booking>();
             BusAmenities = new HashSet<BusAmenity>();
+            BusDepartures = new HashSet<BusDeparture>();
             BusSeats = new HashSet<BusSeat>();
             DroppingPoints = new HashSet<DroppingPoint>();
             Routes = new HashSet<Route>();
@@ -26,11 +27,11 @@ namespace FastXBookingSample.Models
         public TimeSpan EndTime { get; set; }
         public int Fare { get; set; }
         public int? BusOperator { get; set; }
-        public DateTime DepartureDate { get; set; }
 
         public virtual ICollection<BoardingPoint> BoardingPoints { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<BusAmenity> BusAmenities { get; set; }
+        public virtual ICollection<BusDeparture> BusDepartures { get; set; }
         public virtual ICollection<BusSeat> BusSeats { get; set; }
         public virtual ICollection<DroppingPoint> DroppingPoints { get; set; }
         public virtual ICollection<Route> Routes { get; set; }

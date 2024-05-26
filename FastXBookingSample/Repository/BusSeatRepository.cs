@@ -15,13 +15,14 @@ namespace FastXBookingSample.Repository
             _busRepository = busRepository;
         }
 
-        public void AddSeatByBusId(int busid,int seats)
+        public void AddSeatByBusId(int busid,int seats, int deptId)
         {
             for (int i = 1; i <= seats; i++) {
                 _context.BusSeats.Add(new BusSeat()
                 {
                     BusId = busid,
                     SeatNo = i,
+                    DepartureId=deptId,
                     IsBooked = false,
                 });
             }
@@ -36,11 +37,12 @@ namespace FastXBookingSample.Repository
             _context.SaveChanges() ;
         }
 
-        public List<BusSeat> GetSeatsByBusId(int busid)
+        public List<BusSeat> GetSeatsByBusId(int busid,DateTime deptId)
         {
             if (!_busRepository.BusExists(busid))
                 throw new BusNotFoundException();
-            return _context.BusSeats.Where(x=>x.BusId == busid).ToList();
+            BusDeparture busDeparture = _context.BusDepartures.FirstOrDefault(z=>z.BusId == busid&& z.DepartureDate==deptId);
+            return _context.BusSeats.Where(x=>x.BusId == busid&& x.DepartureId==busDeparture.Id).ToList();
         }
     }
 }
