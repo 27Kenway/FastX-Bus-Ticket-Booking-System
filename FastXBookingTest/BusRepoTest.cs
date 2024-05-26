@@ -70,10 +70,13 @@ namespace FastXBookingTest
         [Test]
         public async Task TestForPostBus()
         {
-            Bus bus = new Bus();
-            _busRepository.Setup(x => x.CreateBus(bus)).Returns("Added Successfully");
-            string output = await Task.Run(() => _busRepository.Object.CreateBus(bus));
-            Assert.AreEqual(output, "Added Successfully");
+            Bus bus = new Bus()
+            {
+                BusName = "Sample"
+            };
+            _busRepository.Setup(x => x.CreateBus(bus)).Returns(new Bus(){ BusName = "Sample"});
+            Bus bus1 = await Task.Run(() => _busRepository.Object.CreateBus(bus));
+            Assert.AreEqual(bus.BusName,bus1.BusName);
         }
 
 

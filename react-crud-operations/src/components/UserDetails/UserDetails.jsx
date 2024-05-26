@@ -41,7 +41,7 @@ function UserDetails() {
   }, []); 
 
   const handleDeleteBus=async (userId)=>{
-    const confirmed = window.confirm('Are you sure you want to delete this bus?');
+    const confirmed = window.confirm('Are you sure you want to delete this user?');
 
     if (!confirmed) {
       return; // If not confirmed, do nothing
@@ -56,6 +56,7 @@ function UserDetails() {
         }
       );
       window.alert('User deleted successfully.');
+      window.location.reload();
     } catch (error) {
       if(error.response && error.response.status === 403){
         window.alert("Unuthorized")

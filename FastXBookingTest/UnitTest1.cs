@@ -1,3 +1,4 @@
+using FastXBookingSample.Interface;
 using FastXBookingSample.Models;
 using FastXBookingSample.Repository;
 using Moq;

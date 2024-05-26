@@ -20,6 +20,7 @@ const Payment = () => {
   const busId = sessionStorage.getItem('busId')
   const navigate = useNavigate();
   const role = sessionStorage.getItem('role')
+  const deptDate = sessionStorage.getItem('DeptDate')
 
   
 useEffect(()=>{
@@ -60,12 +61,12 @@ useEffect(()=>{
 
       // Create booking
       const bookingResponse = await axios.post(
-        `https://localhost:7114/api/Bookings`,
+        `https://localhost:7114/api/Bookings?deptDate=${deptDate}`,
         {
           userId: userId,
           busId: busId,
           boardingId: selectedBoardingPointId,
-          droppingId: selectedDroppingPointId
+          droppingId: selectedDroppingPointId,
         },
         {
           headers: {
@@ -101,12 +102,13 @@ useEffect(()=>{
       // Proceed with payment processing...
       console.log('Payment submitted successfully!');
       // Add your payment processing logic here
+      navigate("/paymentsuccess")
     } catch (error) {
       console.error('Error submitting payment:', error);
       // Handle error, show error message to the user
       alert('Failed to process payment. Please try again.');
     }
-    navigate("/paymentsuccess")
+    
   };
 
   return (

@@ -5,6 +5,8 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setBusInfo } from '../Redux/Actions';
 import Navbar from '../Navbar/Navbar';
+import wallpaper from '../../assets/wallpaper.jpg'; 
+
 
 function Bus() {
   const [amenities, setAmenities] = useState({});
@@ -96,6 +98,7 @@ useEffect(() => {
   return (
     <div>
       <Navbar/>
+      
       <div class="sidebar">
       <p>Bus Type:</p> 
       <div className="filter-options">

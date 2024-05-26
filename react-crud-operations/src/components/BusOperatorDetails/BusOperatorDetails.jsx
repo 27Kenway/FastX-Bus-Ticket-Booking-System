@@ -56,6 +56,7 @@ function BusOperatorDetails() {
         }
       );
       window.alert('Bus Operator deleted successfully.');
+      window.location.reload();
     } catch (error) {
       if(error.response && error.response.status === 403){
         window.alert("Unuthorized")

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectOrigin, selectDestination, selectTravelDate } from '../Redux/Actions';
 import Navbar from '../Navbar/Navbar';
-import wallpaper from '../../assets/wallpaper.jpg'; // Import the wallpaper image
+import wallpaper from '../../assets/wallpaper.jpg'; 
 
 function FromAndTo() {
     const cities = ['Delhi', 'Hyderabad', 'Bangalore', 'Mumbai', 'Chennai'];
@@ -24,7 +24,7 @@ function FromAndTo() {
     const token = sessionStorage.getItem('authToken');
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    
     const [minDate, setMinDate] = useState('');
     useEffect(() => {
         const token = sessionStorage.getItem('authToken');
@@ -75,7 +75,7 @@ function FromAndTo() {
             errors.travelDate = 'Please select a travel date.';
             isValid = false;
         }
-
+        sessionStorage.setItem("DeptDate",TravelDate.travelDate)
         if (isValid) {
             try {
                 const response = await axios.get(`https://localhost:7114/api/Buses/GetBusByDetails?origin=${Origin.origin}&destination=${Destination.destination}&date=${TravelDate.travelDate.split('T')[0]}`, {
@@ -105,7 +105,7 @@ function FromAndTo() {
     return (
         <div>
             <Navbar />
-            <img src={wallpaper} alt="wallpaper" className={styles.image} /> {/* Add the background image */}
+            <img src={wallpaper} alt="wallpaper" className={styles.image} /> 
             <div className={styles.fromAndTo}>
                 <div className={styles.a}>
                     <div className={styles.ikHMPa}>
